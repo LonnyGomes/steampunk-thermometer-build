@@ -32,6 +32,7 @@ void setup() {
 
   // set up pins
   pinMode(PIN_PHOTOCELL, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   // start monitoring temperature/humidity
   dht.begin();
@@ -39,6 +40,9 @@ void setup() {
   // attach to servos
   servoTemp.attach(SERVO_PIN_TEMP);
   servoHumid.attach(SERVO_PIN_HUMID);
+
+  // shut of internal LED
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
@@ -61,6 +65,12 @@ void loop() {
   servoHumid.write(servoPosHumid);
   servoTemp.write(servoPosTemp);  
 
+  printDebugData();
+
+  delay(REFRESH_RATE);
+}
+
+void printDebugData() {
   Serial.print("Lux:");
   Serial.println(luxVal);
   
@@ -69,6 +79,4 @@ void loop() {
 
   Serial.print("Temperature (F): ");
   Serial.println(temperature);
-
-  delay(REFRESH_RATE);
 }
