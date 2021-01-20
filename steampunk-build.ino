@@ -11,6 +11,10 @@
 #define SERVO_PIN_TEMP 3
 #define SERVO_PIN_HUMID 4
 
+// analog pins
+#define PIN_PHOTOCELL A0
+
+
 // library instance definitions
 DHT dht(DHT_PIN, DHT_TYPE);
 Servo servoTemp;
@@ -19,11 +23,15 @@ Servo servoHumid;
 // variable definitions
 float temperature;
 float humidity;
+float luxVal;
 int servoValTemp;
 int servoValHumid;
 
 void setup() {
   Serial.begin(9600);
+
+  // set up pins
+  pinMode(PIN_PHOTOCELL, INPUT);
 
   // start monitoring temperature/humidity
   dht.begin();
@@ -36,6 +44,7 @@ void setup() {
 void loop() {
   Serial.println();
 
+  luxVal = analogRead(PIN_PHOTOCELL);
   humidity = dht.readHumidity(); 
   temperature = dht.readTemperature(true);
 
@@ -52,8 +61,9 @@ void loop() {
   servoHumid.write(servoPosHumid);
   servoTemp.write(servoPosTemp);  
 
-  Serial.print(servoPosTemp);
-  Serial.print("----");
+  Serial.print("Lux:");
+  Serial.println(luxVal);
+  
   Serial.print("Humidity (%): ");
   Serial.println((float)humidity, 2);
 
