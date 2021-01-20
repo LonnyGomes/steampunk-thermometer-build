@@ -16,7 +16,7 @@
 
 // analog pins
 #define PIN_PHOTOCELL A0
-
+#define PIN_POT A1
 
 // library instance definitions
 DHT dht(DHT_PIN, DHT_TYPE);
@@ -28,6 +28,7 @@ Adafruit_NeoPixel strip(1, DPIN_THERMO_LED, NEO_GRB + NEO_KHZ800);
 float temperature;
 float humidity;
 float luxVal;
+float potVal;
 int servoValTemp;
 int servoValHumid;
 uint32_t clrThermLed = strip.Color(255, 255, 0);
@@ -60,6 +61,7 @@ void loop() {
   strip.setPixelColor(0, clrThermLed);
   strip.show();
 
+  potVal = analogRead(PIN_POT);
   luxVal = analogRead(PIN_PHOTOCELL);
   humidity = dht.readHumidity(); 
   temperature = dht.readTemperature(true);
@@ -92,4 +94,6 @@ void printDebugData() {
   Serial.print("Temperature (F): ");
   Serial.println(temperature);
 
+  Serial.print("Pot: ");
+  Serial.println(potVal);
 }
