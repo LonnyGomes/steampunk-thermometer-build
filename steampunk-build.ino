@@ -1,5 +1,6 @@
 #include <Servo.h>
 #include "DHT.h"
+#include <Adafruit_NeoPixel.h>
 
 // the delay for each loop cyle
 #define REFRESH_RATE 2000
@@ -10,6 +11,8 @@
 // data pins for servos
 #define SERVO_PIN_TEMP 3
 #define SERVO_PIN_HUMID 4
+// data pins for LEDS
+#define DPIN_THERMO_LED 7
 
 // analog pins
 #define PIN_PHOTOCELL A0
@@ -19,6 +22,7 @@
 DHT dht(DHT_PIN, DHT_TYPE);
 Servo servoTemp;
 Servo servoHumid;
+Adafruit_NeoPixel strip(1, DPIN_THERMO_LED, NEO_GRB + NEO_KHZ800);
 
 // variable definitions
 float temperature;
@@ -26,6 +30,7 @@ float humidity;
 float luxVal;
 int servoValTemp;
 int servoValHumid;
+uint32_t clrThermLed = strip.Color(255, 255, 0);
 
 void setup() {
   Serial.begin(9600);
@@ -43,10 +48,17 @@ void setup() {
 
   // shut of internal LED
   digitalWrite(LED_BUILTIN, LOW);
+
+  // initialize pixels
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
 }
 
 void loop() {
   Serial.println();
+
+  strip.setPixelColor(0, clrThermLed);
+  strip.show();
 
   luxVal = analogRead(PIN_PHOTOCELL);
   humidity = dht.readHumidity(); 
@@ -79,4 +91,5 @@ void printDebugData() {
 
   Serial.print("Temperature (F): ");
   Serial.println(temperature);
+
 }
