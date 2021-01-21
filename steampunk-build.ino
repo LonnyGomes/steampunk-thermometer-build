@@ -29,9 +29,11 @@ float temperature;
 float humidity;
 float luxVal;
 float potVal;
+float thermBrightness;
 int servoValTemp;
 int servoValHumid;
-uint32_t clrThermLed = strip.Color(255, 255, 0);
+int clrsTherm[] = {255, 255, 0};
+//uint32_t clrThermLed = strip.Color(255, 255, 0);
 
 void setup() {
   Serial.begin(9600);
@@ -58,13 +60,18 @@ void setup() {
 void loop() {
   Serial.println();
 
-  strip.setPixelColor(0, clrThermLed);
-  strip.show();
-
   potVal = analogRead(PIN_POT);
   luxVal = analogRead(PIN_PHOTOCELL);
   humidity = dht.readHumidity(); 
   temperature = dht.readTemperature(true);
+
+  thermBrightness = map(potVal, 0, 1024, 0, 255) / 255.0;
+  strip.setPixelColor(0,
+    clrsTherm[0] * thermBrightness,
+    clrsTherm[1] * thermBrightness,
+    clrsTherm[2] * thermBrightness
+  );
+  strip.show();
 
   if (isnan(humidity) || isnan(temperature)) {
     Serial.println(F("Failed to read from DHT sensor!"));
