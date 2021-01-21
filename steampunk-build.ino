@@ -2,6 +2,8 @@
 #include "DHT.h"
 #include <Adafruit_NeoPixel.h>
 
+#define DEBUG_ALIGN_SERVOS 0
+
 // the delay for each loop cyle
 #define REFRESH_RATE 2000
 // type of temperature sensor
@@ -58,6 +60,9 @@ void setup() {
 }
 
 void loop() {
+  int servoPosHumid;
+  int servoPosTemp;
+  
   Serial.println();
 
   potVal = analogRead(PIN_POT);
@@ -81,8 +86,8 @@ void loop() {
 
   // calculate servo positions based on temp/humid values
   // NOTE: servo ranges must be flipped because of thier rotation
-  int servoPosHumid = map(humidity, 0, 100, 180, 0);
-  int servoPosTemp = map(temperature, 0, 100, 180, 0);
+  servoPosHumid = DEBUG_ALIGN_SERVOS ? 180 : map(humidity, 0, 100, 180, 0);
+  servoPosTemp = DEBUG_ALIGN_SERVOS ? 180: map(temperature, 0, 100, 180, 0);
   servoHumid.write(servoPosHumid);
   servoTemp.write(servoPosTemp);  
 
