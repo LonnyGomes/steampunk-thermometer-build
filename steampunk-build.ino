@@ -5,7 +5,7 @@
 #define DEBUG_ALIGN_SERVOS 0
 
 // the delay for each loop cyle
-#define REFRESH_RATE 2000
+#define REFRESH_RATE 4000
 // type of temperature sensor
 #define DHT_TYPE DHT22 
 // data pin for temperature sensor
@@ -86,8 +86,8 @@ void loop() {
 
   // calculate servo positions based on temp/humid values
   // NOTE: servo ranges must be flipped because of thier rotation
-  servoPosHumid = DEBUG_ALIGN_SERVOS ? 180 : map(humidity, 0, 100, 180, 0);
-  servoPosTemp = DEBUG_ALIGN_SERVOS ? 180: map(temperature, 0, 100, 180, 0);
+  servoPosHumid = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS : map(humidity, 0, 100, 180, 0);
+  servoPosTemp = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS: map(temperature, 0, 100, 180, 0);
   servoHumid.write(servoPosHumid);
   servoTemp.write(servoPosTemp);  
 
