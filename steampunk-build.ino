@@ -19,6 +19,7 @@
 // analog pins
 #define PIN_PHOTOCELL A0
 #define PIN_POT A1
+#define PIN_LED_SWITCH A2
 
 // library instance definitions
 DHT dht(DHT_PIN, DHT_TYPE);
@@ -32,6 +33,7 @@ float humidity;
 float luxVal;
 float thermBrightness;
 int potVal;
+int ledSwitchVal;
 int servoValTemp;
 int servoValHumid;
 int clrsTherm[] = {255, 255, 0};
@@ -67,10 +69,13 @@ void loop() {
 
   potVal = analogRead(PIN_POT);
   luxVal = analogRead(PIN_PHOTOCELL);
+  ledSwitchVal = analogRead(PIN_LED_SWITCH);
   humidity = dht.readHumidity(); 
   temperature = dht.readTemperature(true);
 
-  thermBrightness = map(potVal, 0, 1024, 16, 255) / 255.0;
+  // if ledSwitch is off, set brightness to zero
+  thermBrightness = (ledSwitchVal > 10) ?  map(potVal, 0, 1024, 16, 255) / 255.0 : 0;
+  
   strip.setPixelColor(0,
     clrsTherm[0] * thermBrightness,
     clrsTherm[1] * thermBrightness,
@@ -108,4 +113,7 @@ void printDebugData() {
 
   Serial.print("Pot: ");
   Serial.println(potVal);
+
+  Serial.print("LED Switch: ");
+  Serial.println(ledSwitchVal);
 }
