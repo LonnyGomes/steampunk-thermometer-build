@@ -70,7 +70,7 @@ void loop() {
   humidity = dht.readHumidity(); 
   temperature = dht.readTemperature(true);
 
-  thermBrightness = map(potVal, 0, 1024, 0, 255) / 255.0;
+  thermBrightness = map(potVal, 0, 1024, 16, 255) / 255.0;
   strip.setPixelColor(0,
     clrsTherm[0] * thermBrightness,
     clrsTherm[1] * thermBrightness,
