@@ -3,6 +3,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #define DEBUG_ALIGN_SERVOS 90
+#define DEBUG_DISABLE_SERVOS 0
 
 // the delay for each loop cyle
 #define REFRESH_RATE 4000
@@ -51,9 +52,11 @@ void setup() {
   // start monitoring temperature/humidity
   dht.begin();
 
+  #ifndef DEBUG_DISABLE_SERVOS
   // attach to servos
   servoTemp.attach(SERVO_PIN_TEMP);
   servoHumid.attach(SERVO_PIN_HUMID);
+  #endif
 
   // shut of internal LED
   digitalWrite(LED_BUILTIN, LOW);
@@ -99,8 +102,10 @@ void loop() {
   // NOTE: servo ranges must be flipped because of thier rotation
   servoPosHumid = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS : map(humidity, 0, 100, 180, 0);
   servoPosTemp = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS: map(temperature, 0, 100, 180, 0);
+  #ifndef DEBUG_DISABLE_SERVOS
   servoHumid.write(servoPosHumid);
-  servoTemp.write(servoPosTemp);  
+  servoTemp.write(servoPosTemp);
+  #endif
 
   printDebugData();
 
