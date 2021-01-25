@@ -2,7 +2,7 @@
 #include "DHT.h"
 #include <Adafruit_NeoPixel.h>
 
-#define DEBUG_ALIGN_SERVOS 0
+#define DEBUG_ALIGN_SERVOS 90
 
 // the delay for each loop cyle
 #define REFRESH_RATE 4000
@@ -15,6 +15,8 @@
 #define SERVO_PIN_HUMID 4
 // data pins for LEDS
 #define DPIN_THERMO_LED 7
+// total number of LEDs to control
+#define LED_COUNT 8
 
 // analog pins
 #define PIN_PHOTOCELL A0
@@ -25,7 +27,7 @@
 DHT dht(DHT_PIN, DHT_TYPE);
 Servo servoTemp;
 Servo servoHumid;
-Adafruit_NeoPixel strip(1, DPIN_THERMO_LED, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip(LED_COUNT, DPIN_THERMO_LED, NEO_GRBW + NEO_KHZ800);
 
 // variable definitions
 float temperature;
@@ -36,7 +38,7 @@ int potVal;
 int ledSwitchVal;
 int servoValTemp;
 int servoValHumid;
-int clrsTherm[] = {255, 255, 0};
+int clrsTherm[] = {255, 255, 0, 255};
 //uint32_t clrThermLed = strip.Color(255, 255, 0);
 
 void setup() {
@@ -75,12 +77,16 @@ void loop() {
 
   // if ledSwitch is off, set brightness to zero
   thermBrightness = (ledSwitchVal > 10) ?  map(potVal, 0, 1024, 16, 255) / 255.0 : 0;
-  
-  strip.setPixelColor(0,
-    clrsTherm[0] * thermBrightness,
-    clrsTherm[1] * thermBrightness,
-    clrsTherm[2] * thermBrightness
-  );
+
+  for (int index = 0; index < LED_COUNT; index++) {
+    strip.setPixelColor(index,
+      clrsTherm[0] * thermBrightness,
+      clrsTherm[1] * thermBrightness,
+      clrsTherm[2] * thermBrightness,
+      clrsTherm[3] * thermBrightness
+    );
+  }
+
   strip.show();
 
   if (isnan(humidity) || isnan(temperature)) {
