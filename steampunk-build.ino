@@ -3,7 +3,6 @@
 #include <Adafruit_NeoPixel.h>
 
 #define DEBUG_ALIGN_SERVOS 90
-#define DEBUG_DISABLE_SERVOS 0
 
 // the delay for each loop cyle
 #define REFRESH_RATE 4000
@@ -15,7 +14,7 @@
 #define SERVO_PIN_TEMP 3
 #define SERVO_PIN_HUMID 4
 // data pins for LEDS
-#define DPIN_THERMO_LED 7
+#define DPIN_THERMO_LED 5
 // total number of LEDs to control
 #define LED_COUNT 8
 
@@ -31,6 +30,7 @@ Servo servoHumid;
 Adafruit_NeoPixel strip(LED_COUNT, DPIN_THERMO_LED, NEO_GRBW + NEO_KHZ800);
 
 // variable definitions
+unsigned long curMillis;
 float temperature;
 float humidity;
 float luxVal;
@@ -39,7 +39,7 @@ int potVal;
 int ledSwitchVal;
 int servoValTemp;
 int servoValHumid;
-int clrsTherm[] = {255, 255, 0, 255};
+int clrsTherm[] = {0, 0, 0, 255};
 //uint32_t clrThermLed = strip.Color(255, 255, 0);
 
 void setup() {
@@ -52,11 +52,9 @@ void setup() {
   // start monitoring temperature/humidity
   dht.begin();
 
-  #ifndef DEBUG_DISABLE_SERVOS
   // attach to servos
   servoTemp.attach(SERVO_PIN_TEMP);
   servoHumid.attach(SERVO_PIN_HUMID);
-  #endif
 
   // shut of internal LED
   digitalWrite(LED_BUILTIN, LOW);
@@ -102,10 +100,8 @@ void loop() {
   // NOTE: servo ranges must be flipped because of thier rotation
   servoPosHumid = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS : map(humidity, 0, 100, 180, 0);
   servoPosTemp = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS: map(temperature, 0, 100, 180, 0);
-  #ifndef DEBUG_DISABLE_SERVOS
   servoHumid.write(servoPosHumid);
   servoTemp.write(servoPosTemp);
-  #endif
 
   printDebugData();
 
