@@ -5,7 +5,9 @@
 #define DEBUG_ALIGN_SERVOS 0
 
 // the delay for each loop cyle
-#define REFRESH_RATE 4000
+#define REFRESH_RATE 500
+// the temperature reading interval (in ms)
+#define TEMP_READING_INTERVAL 5000
 // type of temperature sensor
 #define DHT_TYPE DHT22 
 // data pin for temperature sensor
@@ -31,6 +33,7 @@ Adafruit_NeoPixel strip(LED_COUNT, DPIN_THERMO_LED, NEO_GRBW + NEO_KHZ800);
 
 // variable definitions
 unsigned long curMillis;
+unsigned long lastTempCheck = 0;
 float temperature;
 float humidity;
 float luxVal;
@@ -67,9 +70,8 @@ void setup() {
 void loop() {
   int servoPosHumid;
   int servoPosTemp;
-  
-  Serial.println();
 
+  curMillis = millis();
   potVal = analogRead(PIN_POT);
   luxVal = analogRead(PIN_PHOTOCELL);
   ledSwitchVal = analogRead(PIN_LED_SWITCH);
@@ -90,25 +92,32 @@ void loop() {
 
   strip.show();
 
-  if (isnan(humidity) || isnan(temperature)) {
-    Serial.println(F("Failed to read from DHT sensor!"));
-    delay(REFRESH_RATE);
-    return;
+  // only read the temperature based on the defined interval
+  // there is logic to handle the overflow where currMillis restarts
+  // NOTE: this code should be converted to using a timer interval at some point
+  if ((curMillis >= lastTempCheck + TEMP_READING_INTERVAL) || (curMillis < lastTempCheck)) {
+    // save last time temperature was checked so it doesn't repeat
+    lastTempCheck = curMillis;
+
+    if (isnan(humidity) || isnan(temperature)) {
+      Serial.println(F("Failed to read from DHT sensor!"));
+    } else {
+      // calculate servo positions based on temp/humid values
+      // NOTE: servo ranges must be flipped because of thier rotation
+      servoPosHumid = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS : map(humidity, 0, 100, 180, 0);
+      servoPosTemp = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS: map(temperature, 0, 100, 180, 0);
+      servoHumid.write(servoPosHumid);
+      servoTemp.write(servoPosTemp);  
+    }
+
+    printDebugData();
   }
-
-  // calculate servo positions based on temp/humid values
-  // NOTE: servo ranges must be flipped because of thier rotation
-  servoPosHumid = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS : map(humidity, 0, 100, 180, 0);
-  servoPosTemp = DEBUG_ALIGN_SERVOS ? DEBUG_ALIGN_SERVOS: map(temperature, 0, 100, 180, 0);
-  servoHumid.write(servoPosHumid);
-  servoTemp.write(servoPosTemp);
-
-  printDebugData();
 
   delay(REFRESH_RATE);
 }
 
 void printDebugData() {
+  Serial.println("-------------");
   Serial.print("Lux:");
   Serial.println(luxVal);
   
