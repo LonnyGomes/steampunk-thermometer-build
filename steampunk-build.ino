@@ -2,7 +2,7 @@
 #include "DHT.h"
 #include <Adafruit_NeoPixel.h>
 
-#define DEBUG_ALIGN_SERVOS 90
+#define DEBUG_ALIGN_SERVOS 0
 
 // the delay for each loop cyle
 #define REFRESH_RATE 4000
@@ -77,7 +77,7 @@ void loop() {
   temperature = dht.readTemperature(true);
 
   // if ledSwitch is off, set brightness to zero
-  thermBrightness = (ledSwitchVal > 10) ?  map(potVal, 0, 1024, 16, 255) / 255.0 : 0;
+  thermBrightness = (ledSwitchVal != LOW) ?  map(potVal, 0, 1024, 16, 255) / 255.0 : 0;
 
   for (int index = 0; index < LED_COUNT; index++) {
     strip.setPixelColor(index,
