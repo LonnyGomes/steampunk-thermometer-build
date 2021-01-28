@@ -25,6 +25,9 @@
 #define PIN_POT A1
 #define PIN_LED_SWITCH A2
 
+// total number of colors to cycle through
+#define TOTAL_CLRS 4
+
 // library instance definitions
 DHT dht(DHT_PIN, DHT_TYPE);
 Servo servoTemp;
@@ -42,7 +45,13 @@ int potVal;
 int ledSwitchVal;
 int servoValTemp;
 int servoValHumid;
-int clrsTherm[] = {0, 0, 0, 255};
+int curColorIdx = 0;
+int clrsTherm[][4] = {
+  {0, 0, 0, 255},
+  {255, 0, 0, 0},
+  {0, 255, 0, 0},
+  {0, 0, 255, 0}
+};
 //uint32_t clrThermLed = strip.Color(255, 255, 0);
 
 void setup() {
@@ -81,12 +90,15 @@ void loop() {
   // if ledSwitch is off, set brightness to zero
   thermBrightness = (ledSwitchVal != LOW) ?  map(potVal, 0, 1024, 16, 255) / 255.0 : 0;
 
+  // calculate which color to show based on position of potentiometer
+  curColorIdx = map(potVal, 0, 1023, 0, TOTAL_CLRS - 1);
+
   for (int index = 0; index < LED_COUNT; index++) {
     strip.setPixelColor(index,
-      clrsTherm[0] * thermBrightness,
-      clrsTherm[1] * thermBrightness,
-      clrsTherm[2] * thermBrightness,
-      clrsTherm[3] * thermBrightness
+      clrsTherm[curColorIdx][0] * thermBrightness,
+      clrsTherm[curColorIdx][1] * thermBrightness,
+      clrsTherm[curColorIdx][2] * thermBrightness,
+      clrsTherm[curColorIdx][3] * thermBrightness
     );
   }
 
